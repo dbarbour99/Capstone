@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\UserAuthorized\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{3A828AD0-B5DB-4532-AF94-EC0F2E09CAA0}|UserAuthorized\\UserAuthorized.csproj|c:\\users\\david\\documents\\iot\\capstone\\csharpcode\\userauthorized\\userauthorized\\controllers\\userauthorizedcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3A828AD0-B5DB-4532-AF94-EC0F2E09CAA0}|UserAuthorized\\UserAuthorized.csproj|solutionrelative:userauthorized\\controllers\\userauthorizedcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3A828AD0-B5DB-4532-AF94-EC0F2E09CAA0}|UserAuthorized\\UserAuthorized.csproj|c:\\users\\david\\documents\\iot\\capstone\\csharpcode\\userauthorized\\userauthorized\\code\\sqlhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3A828AD0-B5DB-4532-AF94-EC0F2E09CAA0}|UserAuthorized\\UserAuthorized.csproj|solutionrelative:userauthorized\\code\\sqlhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3A828AD0-B5DB-4532-AF94-EC0F2E09CAA0}|UserAuthorized\\UserAuthorized.csproj|c:\\users\\david\\documents\\iot\\capstone\\csharpcode\\userauthorized\\userauthorized\\code\\functions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3A828AD0-B5DB-4532-AF94-EC0F2E09CAA0}|UserAuthorized\\UserAuthorized.csproj|solutionrelative:userauthorized\\code\\functions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UserAuthorizedController.cs",
+              "DocumentMoniker": "C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\UserAuthorized\\UserAuthorized\\Controllers\\UserAuthorizedController.cs",
+              "RelativeDocumentMoniker": "UserAuthorized\\Controllers\\UserAuthorizedController.cs",
+              "ToolTip": "C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\UserAuthorized\\UserAuthorized\\Controllers\\UserAuthorizedController.cs",
+              "RelativeToolTip": "UserAuthorized\\Controllers\\UserAuthorizedController.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-04T23:59:06.738Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SQLHelper.cs",
+              "DocumentMoniker": "C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\UserAuthorized\\UserAuthorized\\Code\\SQLHelper.cs",
+              "RelativeDocumentMoniker": "UserAuthorized\\Code\\SQLHelper.cs",
+              "ToolTip": "C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\UserAuthorized\\UserAuthorized\\Code\\SQLHelper.cs",
+              "RelativeToolTip": "UserAuthorized\\Code\\SQLHelper.cs",
+              "ViewState": "AQIAAB4AAAAAAAAAAAAAwDkAAAAQAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-04T23:58:01.521Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Functions.cs",
+              "DocumentMoniker": "C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\UserAuthorized\\UserAuthorized\\Code\\Functions.cs",
+              "RelativeDocumentMoniker": "UserAuthorized\\Code\\Functions.cs",
+              "ToolTip": "C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\UserAuthorized\\UserAuthorized\\Code\\Functions.cs",
+              "RelativeToolTip": "UserAuthorized\\Code\\Functions.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-04T23:57:16.055Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
