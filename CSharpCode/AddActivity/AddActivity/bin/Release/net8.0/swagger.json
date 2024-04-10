@@ -1,0 +1,53 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "AddActivity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "version": "1.0"
+  },
+  "paths": {
+    "/AddActivity": {
+      "get": {
+        "tags": [
+          "AddActivity"
+        ],
+        "operationId": "AddActivity",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "FingerID",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "EquipID",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "STDCurrent",
+            "type": "number",
+            "format": "float"
+          },
+          {
+            "in": "query",
+            "name": "recordType",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
