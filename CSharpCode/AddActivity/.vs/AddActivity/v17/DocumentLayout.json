@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\AddActivity\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{87145297-31F7-42A5-9A9D-0C9605A2BAE1}|AddActivity\\AddActivity.csproj|c:\\users\\david\\documents\\iot\\capstone\\csharpcode\\addactivity\\addactivity\\controllers\\addactivity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{87145297-31F7-42A5-9A9D-0C9605A2BAE1}|AddActivity\\AddActivity.csproj|solutionrelative:addactivity\\controllers\\addactivity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{87145297-31F7-42A5-9A9D-0C9605A2BAE1}|AddActivity\\AddActivity.csproj|C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\AddActivity\\addactivity\\code\\functions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{87145297-31F7-42A5-9A9D-0C9605A2BAE1}|AddActivity\\AddActivity.csproj|solutionrelative:addactivity\\code\\functions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{87145297-31F7-42A5-9A9D-0C9605A2BAE1}|AddActivity\\AddActivity.csproj|c:\\users\\david\\documents\\iot\\capstone\\csharpcode\\addactivity\\addactivity\\controllers\\addactivity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{87145297-31F7-42A5-9A9D-0C9605A2BAE1}|AddActivity\\AddActivity.csproj|solutionrelative:addactivity\\controllers\\addactivity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{87145297-31F7-42A5-9A9D-0C9605A2BAE1}|AddActivity\\AddActivity.csproj|C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\AddActivity\\addactivity\\code\\sqlhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -22,17 +22,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "AddActivity.cs",
               "DocumentMoniker": "C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\AddActivity\\AddActivity\\Controllers\\AddActivity.cs",
               "RelativeDocumentMoniker": "AddActivity\\Controllers\\AddActivity.cs",
               "ToolTip": "C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\AddActivity\\AddActivity\\Controllers\\AddActivity.cs",
               "RelativeToolTip": "AddActivity\\Controllers\\AddActivity.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAB9AAAA",
+              "ViewState": "AQIAAAsAAAAAAAAAAAAQwBgAAAAtAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-05T00:19:18.395Z",
               "EditorCaption": ""
@@ -47,19 +47,21 @@
               "RelativeToolTip": "AddActivity\\Code\\SQLHelper.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAZAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-05T00:18:07.825Z"
+              "WhenOpened": "2024-04-05T00:18:07.825Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Functions.cs",
               "DocumentMoniker": "C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\AddActivity\\AddActivity\\Code\\Functions.cs",
               "RelativeDocumentMoniker": "AddActivity\\Code\\Functions.cs",
               "ToolTip": "C:\\Users\\David\\Documents\\iot\\Capstone\\CSharpCode\\AddActivity\\AddActivity\\Code\\Functions.cs",
               "RelativeToolTip": "AddActivity\\Code\\Functions.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAAAAAA",
+              "ViewState": "AQIAAAQAAAAAAAAAAAAjwBEAAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-05T00:17:53.967Z"
+              "WhenOpened": "2024-04-05T00:17:53.967Z",
+              "EditorCaption": ""
             }
           ]
         }

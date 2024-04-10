@@ -36,3 +36,4 @@ C:\Users\David\Documents\iot\Capstone\CSharpCode\AddActivity\AddActivity\obj\Rel
 C:\Users\David\Documents\iot\Capstone\CSharpCode\AddActivity\AddActivity\obj\Release\net8.0\AddActivity.pdb
 C:\Users\David\Documents\iot\Capstone\CSharpCode\AddActivity\AddActivity\obj\Release\net8.0\AddActivity.genruntimeconfig.cache
 C:\Users\David\Documents\iot\Capstone\CSharpCode\AddActivity\AddActivity\obj\Release\net8.0\ref\AddActivity.dll
+C:\Users\David\Documents\iot\Capstone\CSharpCode\AddActivity\AddActivity\obj\Release\net8.0\AddActivity.sourcelink.json

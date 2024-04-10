@@ -11,15 +11,16 @@
 #include "Neopixel.h"
 #include "Colors.h"
 
-const int green_led_pin = D0;
-const int red_led_pin = D1;
-const int BUTTONPIN=D3;
-const int NEOPIN=D2;
-const int PIXELCOUNT = 12;
+const int REDLEDPIN = D2;
+const int GREENLEDPIN = D3;
+const int BUTTONPIN=D4;
+const int NEOPIN=D5;
+
+const int PIXELCOUNT = 1;
 
 //fingerprint reader
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&Serial1);
-Adafruit_NeoPixel pixel (PIXELCOUNT,SPI1,WS2812B);
+Adafruit_NeoPixel pixel (PIXELCOUNT,SPI,WS2812B);
 
 uint8_t getFingerprintEnroll(uint8_t id);
 int getFingerprintIDez();
@@ -55,10 +56,10 @@ void setup() {
   }
 
   Serial.println("Waiting for valid finger...");
-  pinMode(red_led_pin, OUTPUT);
-  pinMode(green_led_pin, OUTPUT);
-  digitalWrite(red_led_pin, 0);
-  digitalWrite(green_led_pin, 0);
+  pinMode(REDLEDPIN, OUTPUT);
+  pinMode(GREENLEDPIN, OUTPUT);
+  digitalWrite(REDLEDPIN, 0);
+  digitalWrite(GREENLEDPIN, 0);
 
   PixelFill(0,PIXELCOUNT-1,black);
 
@@ -95,14 +96,14 @@ void loop() {
     switch (theAnswer)
     {
     case FINGERPRINT_OK:
-      digitalWrite(green_led_pin,1);
-      digitalWrite(red_led_pin,0);
+      digitalWrite(GREENLEDPIN,1);
+      digitalWrite(REDLEDPIN,0);
       PixelFill(0,PIXELCOUNT,green);
       break;
     
     case FINGERPRINT_NOTFOUND:
-      digitalWrite(green_led_pin,0);
-      digitalWrite(red_led_pin,1);
+      digitalWrite(GREENLEDPIN,0);
+      digitalWrite(REDLEDPIN,1);
       PixelFill(0,PIXELCOUNT,yellow);
 
     default:
@@ -211,11 +212,11 @@ int getFingerprintIDez() {
   // found a match!
   Serial.print("Found ID #"); Serial.print(finger.fingerID); 
   Serial.print(" with confidence of "); Serial.println(finger.confidence);
-  digitalWrite(green_led_pin, 1);
-  digitalWrite(red_led_pin, 0);
+  digitalWrite(GREENLEDPIN, 1);
+  digitalWrite(REDLEDPIN, 0);
   delay(6000);
-  digitalWrite(green_led_pin, 0);
-  digitalWrite(red_led_pin, 1);
+  digitalWrite(GREENLEDPIN, 0);
+  digitalWrite(REDLEDPIN, 1);
   return finger.fingerID; 
 }
 

@@ -18,7 +18,7 @@ namespace AddActivity
         {
             string theTime = DateTime.Now.ToString("MM/dd/yy HH:mm:ss");
             string theSQL = string.Format("INSERT INTO ACTIVITY(fprintposition,equipid,thedate,cumcurrent,recordtype) " +
-                "VALUES ({0},{1},'{2}',{3},'{4}')", FingerID, EquipID, theTime, STDCurrent, recordType);
+                "VALUES ({0},{1},'{2}',{3},{4})", FingerID, EquipID, theTime, STDCurrent, recordType);
             using (SqlConnection pOdbcData = new SqlConnection(ConnectConfig()))
             {
                 long RA = SQLHelper.ExecuteNonQuery(pOdbcData, theSQL, null);

@@ -6,7 +6,7 @@ const int red_led_pin = 2, green_led_pin = 3;
 
 int getFingerprintIDez();
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&Serial1);
-IoTTimer oneSecondTimer();
+IoTTimer oneSecondTimer;
 
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
