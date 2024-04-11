@@ -1,5 +1,4 @@
-/* 
- * Project CurrentMaster capstone project
+ /* Project CurrentMaster capstone project
  * Author: David Barbour
  * Date: 4/19/24
  */
@@ -21,7 +20,6 @@
 // web hook data for getting user name (and if they're authorized)
   const char *EVENT_NAME = "GetUsername";
   String userSubscription= "hook-response/GetUsername";
-  int pFingerID=1, pEquipID=2;
   void subscriptionHandler(const char *event, const char *data);
   void sendLoginRequest(int sFingerID,int sEquipID);
 
@@ -45,40 +43,41 @@
   int secDisplay=1;
 
 //current sensor
-  int noOfChannel = 0;
-  int Addr = 0x2A;
-  float current = 0.0;
-  int typeOfSensor = 0;
-  int maxCurrent = 0;
-  byte data[36];
+  const int LOGIN_REC = 0; const int INPROCESS_REC=5; const int LOGOUT_REC=10;
+  int noOfChannel = 0;int Addr = 0x2A;int typeOfSensor = 0;int maxCurrent = 0;int intCumCurrent;
+  float current = 0.0;float cumCurrent = 0; float lastCurrent=0;
+  byte data[36];int lastMillisCalc;float millisDiff;
+  IoTTimer calcCurrentTimer;
+  float getCurrentNow();
 
 //relay to drive 115/115 volts
   const int RELAYPIN = D14;
   bool OnOff = false;
 
 //fingerprint reader
-  const int REDLEDPIN = D2, GREENLEDPIN = D3, FINGERMODEPIN=D4;
+  const int REDLEDPIN = D2, GREENLEDPIN = D3, FINGERMODEPIN = D4;
   const int checkForPrintEvery=1000;
   Adafruit_Fingerprint finger = Adafruit_Fingerprint(&Serial1);
-  IoTTimer checkForPrintTimer;
   IoTTimer rejectTimer;
   Button toggleButton(FINGERMODEPIN,false);
-  Button logOff (D12,true);
+  Button logOff (D12,false);
 
   bool setupMode = false; bool loggedOn = false;
   uint8_t theAnswer; int nextFreeNum;uint8_t fingerID; 
 
   uint8_t getFingerprintID();
   uint8_t getFingerprintEnroll(uint8_t id);
-  uint8_t getFingerID();
+  void launchSetupMode();
   int getNextFree();
+ 
 
 //Program flow variables
   const int TIMEZONE = -6;const int BUTTONLOGOFF=D12;const int equipID = 1;
-  int theState = 0;int userID=-1;int cumCurrent = 0; int lastCurrent=0;
+  int theState = 0;int userID=-1;
   String userName="";String startTime="", finishTime="";String TimeOnly;
-  Button logOffButton(BUTTONLOGOFF,true);
-  IoTTimer displayError; int displayErrorFor = 5000;
+  Button logOffButton(BUTTONLOGOFF,false);
+  IoTTimer logOutTimer; int logOutWaitFor = 10000;
+  IoTTimer autoLogoffTimer; int autoLogOffTime = 600000; //10 minutes
 
   void programLogic();
   void setStatusPixel();
@@ -100,9 +99,12 @@ void setup() {
     display.clearDisplay();
     displayText();
 
+  //setup the relay pin
+    pinMode(RELAYPIN,OUTPUT);
+
   //start the serial monitor
     Serial.begin(9600);
-    waitFor (Serial.isConnected,10000);
+    //waitFor (Serial.isConnected,10000);
 
   //get current time
     Time.zone (-6);
@@ -123,12 +125,24 @@ void setup() {
     pinMode(GREENLEDPIN, OUTPUT);
     digitalWrite(REDLEDPIN, D1);
     digitalWrite(GREENLEDPIN, D0);
-    checkForPrintTimer.startTimer(10);
 
-    //initialze the error display timer
-    displayError.startTimer(10);
+  //get the current sensor ready
+    Wire.begin();
+    Serial.begin(9600);
+    Wire.beginTransmission(Addr);
+    Wire.write(0x92);
+    Wire.write(0x6A);
+    Wire.write(0x02);
+    Wire.write(0x00);
+    Wire.write(0x00);
+    Wire.write(0x00);
+    Wire.write(0x00);
+    Wire.write(0xFE);
+    Wire.endTransmission();
 
-    //delete all the fingerprints and EPROM positions
+  //delete all the fingerprints and EPROM positions
+  //this only gets launched if the "restetAll" variable in the
+  //first line of this code is set to true
     if(resetAll==true){
       finger.emptyDatabase();
       for(int i=0x0000; i<0x00A2;i++){
@@ -142,26 +156,20 @@ void setup() {
       int NextNum = getNextFree();
       Serial.printf("Fingerprint reader reset\n");
       Serial.printf("Next free number %i\n",NextNum);
-
       delay(20000);
     }
 }
 
-
 void loop() { 
 
-  //set the oled text based on the state
-  displayText();
+  //set the display text based on the current state
+    displayText();
 
-  //set the status neo pixel based on the state
-  setStatusPixel();
+  //set the neo pixel based on the current state
+    setStatusPixel();
 
-  //react to the user pushing the logoff button (only if they are logged in)
-  if(logOffButton.isClicked()==true && theState==3){theState = 4;}
-
-  //this is the main program logic  
-  programLogic();
-
+  //this is the main program logic that modifies state based on user inputs
+    programLogic();
 }
 
 void programLogic()
@@ -170,65 +178,50 @@ void programLogic()
       
       case 0: //startup
         //make sure electical is disabled
-        digitalWrite(RELAYPIN,LOW);
+          Serial.printf("Write relay low\n");
+          digitalWrite(RELAYPIN,LOW);
 
         //after you're connected to the particle clound, update the state to ready for login
-        if(Particle.connected()==true){theState=1;}
-        break;
+          if(Particle.connected()==true){theState=1;}
+          break;
       
       case 1: //waiting for login
 
-        //if the user hit's the setup button, allow them
-        //to store more fingerprints
-        if(toggleButton.isPressed()==true){
-          setupMode= !setupMode;
-          Serial.printf("Setupmode = %i\n",setupMode);}
-
-        if (setupMode==true){
-          //This is setup mode
-          nextFreeNum = getNextFree();
-          Serial.printf("Setup mode, next free position is %i\n",nextFreeNum);
-          finger.deleteModel(nextFreeNum);
-          theAnswer = getFingerprintEnroll(nextFreeNum);
-          switch (theAnswer)
-          {
-          case FINGERPRINT_OK:
-            EEPROM.write(0x0000+nextFreeNum,123);
-            Serial.printf("Enrolled at position %i\n",nextFreeNum);
-            break;
-          
-          default:
-            break;
+        //if the user hits the setup button (on the breadboad)
+        //allow them to store more fingerprints
+          if(toggleButton.isPressed()==true){
+            setupMode= !setupMode;
+            Serial.printf("Setupmode = %i\n",setupMode);
           }
-          setupMode=false;
-        }
 
-        //if (checkForPrintTimer.isTimerReady()==true){
-        theAnswer=getFingerprintID();
-        switch (theAnswer)
-        {
-        case FINGERPRINT_OK:
-          digitalWrite(GREENLEDPIN,1);
-          digitalWrite(REDLEDPIN,0);
-          userName = "";
-          Serial.printf("Sending user web request U=%i E=%i",userID,equipID);
-          sendLoginRequest(userID,equipID);
-          theState = 2;
-          break;
-        
-        case FINGERPRINT_NOTFOUND:
-          digitalWrite(GREENLEDPIN,0);
-          digitalWrite(REDLEDPIN,1);
-          theState = 3;rejectTimer.startTimer(5000);
-          break;
+          if (setupMode==true){
+            launchSetupMode();
+            setupMode=false;
+          }
 
-        default:
-          //don't do anything
+        //this is where you'll be waiting most of the time
+        //for someone to scan their fingerprint
+          theAnswer=getFingerprintID();
+          switch (theAnswer){
+            case FINGERPRINT_OK:
+              digitalWrite(GREENLEDPIN,1);
+              digitalWrite(REDLEDPIN,0);
+              userName = "";
+              Serial.printf("Sending user web request U=%i E=%i\n",userID,equipID);
+              sendLoginRequest(userID,equipID);
+              theState = 2;
+              break;
+            
+            case FINGERPRINT_NOTFOUND:
+              digitalWrite(GREENLEDPIN,0);
+              digitalWrite(REDLEDPIN,1);
+              theState = 3;rejectTimer.startTimer(5000);
+              break;
+
+            default: //don't do anything, no fingerprint was read
+              break;
+          }  
           break;
-        }  
-          //checkForPrintTimer.startTimer(1000);
-        //}
-        break;
 
       case 2: //verifying login
         if (userName != ""){
@@ -239,12 +232,19 @@ void programLogic()
           }
           else{
             //you've got a valid login
-            startTime = Time.timeStr();
-            cumCurrent = 0;theState = 4;
+              startTime = Time.timeStr().substring (11,19);
+              cumCurrent = 0.0;theState = 4;
 
-            //send initial record, and then start time for next writes
-            sendData(userID,equipID,0,0);
-            sendDataTimer.startTimer(30000);
+            //send initial record, start timer for next writes, enable 120V
+              sendData(userID,equipID,0,LOGIN_REC);
+              sendDataTimer.startTimer(30000);
+              calcCurrentTimer.startTimer(1000);lastMillisCalc=millis();
+              Serial.printf("Write relay high\n");
+              digitalWrite(RELAYPIN,HIGH);
+
+              //this timer will log of the user if there is
+              //inactivity for a given amount of time
+              autoLogoffTimer.startTimer(autoLogOffTime);
           }
         }
         break;
@@ -254,51 +254,132 @@ void programLogic()
         break;
 
       case 4: //Logged in is green
-        if(sendDataTimer.isTimerReady()==true){
+        if(calcCurrentTimer.isTimerReady()==true){
+          Serial.printf("Capture current, state %i\n",theState);
 
-          //only send data if it's changed
-          if(lastCurrent != cumCurrent){
-            Serial.printf("Usage user %i, equip %i, curr %i, type %i\n",userID,equipID,cumCurrent,5);
-            sendData(userID,equipID,cumCurrent,5);
-            lastCurrent = cumCurrent;
-          }
-          else{
-            Serial.printf("Supress usage record, no change from %i\n",cumCurrent);
-          }
-          sendDataTimer.startTimer(30000);
+          millisDiff = (millis()-lastMillisCalc)/1000;
+          cumCurrent = cumCurrent + (getCurrentNow() * millisDiff);
+          lastMillisCalc = millis();
+          calcCurrentTimer.startTimer(1000);
         }
 
+        if(sendDataTimer.isTimerReady()==true){
+          //send data every 30 seconds if it's changed from the last time you sent it
+            if(lastCurrent != cumCurrent){
+              intCumCurrent = int(cumCurrent);
+              Serial.printf("Usage user %i, equip %i, curr %i, type %i\n",userID,equipID,intCumCurrent,INPROCESS_REC);
+              sendData(userID,equipID,cumCurrent,INPROCESS_REC);
+              lastCurrent = cumCurrent;
+
+              //reset auto log off timer
+              autoLogoffTimer.startTimer(autoLogOffTime);
+            }
+            else{
+              Serial.printf("Supress usage record, no change from %i\n",cumCurrent);
+            }
+            sendDataTimer.startTimer(30000);
+        }
+
+        //log out if user hits the log out button or 10 minutes passes without activity
+        if (logOffButton.isPressed()==true || autoLogoffTimer.isTimerReady()==true){
+          
+          //write the final record
+            finishTime = Time.timeStr().substring (11,19);
+            Serial.printf("User requested log off at %s",finishTime.c_str());
+            theState = 5;
+            Serial.printf("Write relay low\n");
+            digitalWrite(RELAYPIN,LOW);
+            
+          //calculate the final current usage
+            millisDiff = (millis()-lastMillisCalc)/1000;
+            cumCurrent = cumCurrent + (getCurrentNow() * millisDiff);
+            intCumCurrent = int(cumCurrent);
+            Serial.printf("Usage user %i, equip %i, curr %i, type %i\n",userID,equipID,intCumCurrent,LOGOUT_REC);
+
+          //write out the logout record and reset all the variables
+            sendData(userID,equipID,cumCurrent,LOGOUT_REC);
+            logOutTimer.startTimer(logOutWaitFor);
+        }
         break;
 
-      case 5: //logging out is blinking yellow
-        break;
-
-      default:
+      case 5: //logging out is blinking green
+        if(logOutTimer.isTimerReady()==true){
+          lastCurrent=0;cumCurrent=0;userName="";userID=-1;
+          theState=1;
+        }
         break;
     }
+}
 
+void launchSetupMode(){
+
+  //This is setup mode
+    nextFreeNum = getNextFree();
+    Serial.printf("Setup mode, next free position is %i\n",nextFreeNum);
+    finger.deleteModel(nextFreeNum);
+    theAnswer = getFingerprintEnroll(nextFreeNum);
+    switch (theAnswer)
+    {
+    case FINGERPRINT_OK:
+      EEPROM.write(0x0000+nextFreeNum,123);
+      Serial.printf("Enrolled at position %i\n",nextFreeNum);
+      break;
+    
+    default:
+      break;
+    }
+}
+
+float getCurrentNow(){
+  //prepare for getting data
+    Wire.beginTransmission(Addr);
+    Wire.write(0x92);
+    Wire.write(0x6A);
+    Wire.write(0x01);
+    Wire.write(1);
+    Wire.write(1);
+    Wire.write(0x00);
+    Wire.write(0x00);
+    Wire.write((0x92 + 0x6A + 0x01 + 1 + 1 + 0x00 + 0x00) & 0xFF);
+    Wire.endTransmission();
+    delay(500);
+
+  // Request 3 bytes of data
+    Wire.requestFrom(Addr, 3);
+
+  // Read 3 bytes of data (msb1, msb, lsb)
+    int msb1 = Wire.read();
+    int msb = Wire.read();
+    int lsb = Wire.read();
+    current = (msb1 * 65536) + (msb * 256) + lsb;
+
+  // Convert the data to ampere
+    current = current / 1000;
+
+    Serial.printf("Current read value: %0.2f \n", current); 
+    return current;
 }
 
 void sendLoginRequest(int sFingerID,int sEquipID){
   //this sends a login request to the web service
-  Particle.publish(EVENT_NAME, String::format("{\"finger\":%i,\"equip\":%i}", sFingerID, sEquipID), PRIVATE);
+    Particle.publish(EVENT_NAME, String::format("{\"finger\":%i,\"equip\":%i}", sFingerID, sEquipID), PRIVATE);
 }
 
 void sendData(int sFingerID,int sEquipID,int sCurrent,int sType){
   //this sends a login request to the web service
-  Particle.publish(EVENT_NAME_ACTIVE, String::format("{\"finger\":%i,\"equip\":%i,\"current\":%i,\"type\":%i}", 
-    sFingerID, sEquipID,sCurrent,sType), PRIVATE);
+    Particle.publish(EVENT_NAME_ACTIVE, String::format("{\"finger\":%i,\"equip\":%i,\"current\":%i,\"type\":%i}", 
+      sFingerID, sEquipID,sCurrent,sType), PRIVATE);
 }
 
 void subscriptionHandler_ACTIVE(const char *event_active, const char *data_active) {
   //This deteremines if data was written successfully
-  if (data_active==userName){Serial.printf("Usage record success %s\n",data_active);}
+    if (data_active==userName){Serial.printf("Usage record success %s\n",data_active);}
 }
 
 void subscriptionHandler(const char *event, const char *data) {
   //This gets launched when the login request returns a value
-  userName = data;
-  Serial.printf("data = %s\n",data);
+    userName = data;
+    Serial.printf("data = %s\n",data);
 }
 
 void setStatusPixel()
@@ -352,10 +433,10 @@ void setStatusPixel()
         pixel.show();
         break;
 
-      case 5: //logging out is blinking yellow
+      case 5: //logging out is blinking green
         pixelOnOff = !pixelOnOff;
         if(pixelOnOff==true){
-          pixel.setPixelColor(0,yellow);
+          pixel.setPixelColor(0,green);
           pixel.show();
         }
         else{
@@ -411,14 +492,13 @@ void displayText()
 
     case 4: //Logged in
 
-      TimeOnly = startTime.substring (11,19) ;
       display.setTextSize(1);
       display.setCursor(0,0);
       display.printf("User:%s", userName.c_str());
       display.setCursor (0,30);
-      display.printf("Start: %s", TimeOnly.c_str());
+      display.printf("Start: %s", startTime.c_str());
       display.setCursor (0,50);
-      display.printf("Cum Use:%i",cumCurrent);
+      display.printf("Cum Use:%.0f",cumCurrent);
       break;
 
     case 5: //logging out
@@ -427,9 +507,11 @@ void displayText()
       display.printf("Log out");
       display.setCursor (0,30);
       display.setTextSize(1);
-      display.printf("User:%s", userName.c_str());
+      display.printf("End: %s", finishTime.c_str());
       display.setCursor (0,40);
-      display.printf("Cum Use:%i",cumCurrent );
+      display.printf("User: %s", userName.c_str());
+      display.setCursor (0,50);
+      display.printf("Watt hrs: %.0f",cumCurrent );
       break;
 
     default:
@@ -440,52 +522,6 @@ void displayText()
   }
   timerDisplay.startTimer(secDisplay);
   bolDisplay=false;
-}
-
-uint8_t getFingerID() {
-  
-  //return values
-  //   2000  if nothing happened
-  //   1000  if the fingerprint wasn't matched
-  //   {id} if the fingerprint was matched
-
-  int retVal = 2000;
-  uint8_t p = finger.getImage();
-
-  switch (p) {
-    case FINGERPRINT_OK:
-      Serial.println("Image taken");
-      break;
-    default:
-      Serial.println("Finger image error");
-      return retVal;
-  }
-
-  // OK success!
-  p = finger.image2Tz();
-  switch (p) {
-    case FINGERPRINT_OK:
-      Serial.println("Image converted");
-      break;
-    default:
-      Serial.println("Finger conversion error");
-      return retVal;
-  }
-  
-  // OK converted!
-  retVal = 1000;
-  p = finger.fingerFastSearch();
-  if (p == FINGERPRINT_OK) {
-    Serial.println("Found a print match!");
-  } 
-  else {
-    Serial.println("Unknown match error");
-    return retVal;
-  }   
-  
-  // found a match!
-  Serial.print("Found ID #"); Serial.print(finger.fingerID); 
-  return finger.fingerID;
 }
 
 uint8_t getFingerprintID() {
@@ -633,7 +669,6 @@ uint8_t getFingerprintEnroll(uint8_t id) {
   }
 
   // OK success!
-
   p = finger.image2Tz(2);
   switch (p) {
     case FINGERPRINT_OK:
